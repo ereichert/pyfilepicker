@@ -1,10 +1,11 @@
 import os
 import random
+import shutil
 
 EXTENSIONS_OF_INTEREST = ['JPG', 'jpg', 'jpeg','png', 'tif', 'gif', 'TIF']
 
 def get_files(path):
-    print("Gathering file paths.")
+    print('Gathering file paths.')
     file_paths = []
     extensions = []
     for root, _, files in os.walk(path):
@@ -39,12 +40,21 @@ def get_random_file_paths(starting_file_paths, number_of_files = 50):
     # for file_path in files_of_interest:
     #     print(file_path)
     return files_of_interest
+
+def copy_files(sources, destination):
+    # TODO Check if the destination directory exists and if not throw an error
+    for src in sources:
+        print(f'Copying {src}.')
+        shutil.copy(src, destination)
         
 def main():
     # TODO This should be a command line argument
-    path = "/Users/ereichert/Library/CloudStorage/SynologyDrive-household/My Pictures"
-    file_paths = get_files(path)
+    src_root_dir = '/Users/ereichert/Library/CloudStorage/SynologyDrive-household/My Pictures'
+    # TODO This should be a command line argument
+    dst_dir = '/Users/ereichert/Desktop/photos'
+    file_paths = get_files(src_root_dir)
     random_file_paths = get_random_file_paths(file_paths)
+    copy_files(random_file_paths, dst_dir)
 
 
 if __name__ == '__main__':
