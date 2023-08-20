@@ -51,7 +51,9 @@ def get_random_file_paths(starting_file_paths, number_of_files=50):
 
 def copy_files(sources, destination):
     logger = logging.getLogger(__name__)
-    # TODO Check if the destination directory exists and if not throw an error
+    if not os.path.exists(destination):
+        logger.debug(f"Directory, '{destination}' does not exist. Creating directory.")
+        os.mkdir(destination)
     logger.info(f"Copying files to '{destination}'.")
     for src in sources:
         logger.debug(f"Copying {src}.")
