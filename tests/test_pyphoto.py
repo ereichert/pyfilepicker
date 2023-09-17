@@ -2,8 +2,6 @@ import pytest
 import main
 import os
 
-# TODO Create makefile with -s option
-
 PARAMS = [
     (0, 10, 0),  # no files on disk
     (50, 10, 10),  # more files on disk than requested
