@@ -4,8 +4,6 @@ import shutil
 import logging
 
 # TODO Add linter to the command line utilities
-# TODO Add formatter to the command line utilities
-
 EXTENSIONS_OF_INTEREST = ["JPG", "jpg", "jpeg", "png", "tif", "gif", "TIF"]
 
 

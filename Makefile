@@ -14,6 +14,10 @@ watch-test:
 watch-test-loud:
 	poetry run pytest-watcher . -s
 
+.PHONY: format
+format:
+	poetry run black .
+
 .PHONY: bootstrap
 bootstrap:
 	poetry install
