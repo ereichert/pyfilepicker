@@ -1,4 +1,5 @@
-.PHONY: test testloud watch-test watch-test-loud format lint bootstrap
+.PHONY: test testloud watch-test watch-test-loud format lint update-precommits 
+	bootstrap install-deps
 
 test:
 	poetry run pytest
@@ -18,6 +19,10 @@ format:
 lint:
 	poetry run ruff check .
 
-bootstrap:
-	poetry install
+update-precommits:
 	poetry run pre-commit autoupdate
+
+install-deps:
+	poetry install
+
+bootstrap: install-deps update-precommits

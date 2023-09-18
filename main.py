@@ -1,9 +1,8 @@
+import logging
 import os
 import random
 import shutil
-import logging
 
-# TODO Add linter to the command line utilities
 EXTENSIONS_OF_INTEREST = ["JPG", "jpg", "jpeg", "png", "tif", "gif", "TIF"]
 
 
@@ -15,7 +14,7 @@ def main():
     )
     # TODO This should be a command line argument
     dst_dir = "/Users/ereichert/Desktop/photos"
-    get_random_files()
+    get_random_files(src_root_dir, 50, dst_dir)
 
 
 def get_random_files(src_root_dir, num_files_requested, dst_dir):
@@ -38,7 +37,7 @@ def get_files(path):
             if found_extension not in extensions:
                 extensions.append(found_extension)
                 logger.debug(found_extension)
-            # TODO The program should read the list of filtered extensions from a config file.
+            # TODO Read the list of filtered extensions from a config file.
             if found_extension in EXTENSIONS_OF_INTEREST:
                 file_paths.append(os.path.join(root, file))
 
