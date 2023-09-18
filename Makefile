@@ -13,3 +13,8 @@ watch-test:
 .PHONY: watch-test-loud
 watch-test-loud:
 	poetry run pytest-watcher . -s
+
+.PHONY: bootstrap
+bootstrap:
+	poetry install
+	poetry run pre-commit autoupdate
