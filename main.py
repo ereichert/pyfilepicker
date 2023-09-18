@@ -9,6 +9,23 @@ import logging
 EXTENSIONS_OF_INTEREST = ["JPG", "jpg", "jpeg", "png", "tif", "gif", "TIF"]
 
 
+def main():
+    configure_logging()
+    # TODO This should be a command line argument
+    src_root_dir = (
+        "/Users/ereichert/Library/CloudStorage/SynologyDrive-household/My Pictures"
+    )
+    # TODO This should be a command line argument
+    dst_dir = "/Users/ereichert/Desktop/photos"
+    get_random_files()
+
+
+def get_random_files(src_root_dir, num_files_requested, dst_dir):
+    file_paths = get_files(src_root_dir)
+    random_file_paths = get_random_file_paths(file_paths, num_files_requested)
+    copy_files(random_file_paths, dst_dir)
+
+
 def get_files(path):
     logger = logging.getLogger(__name__)
     logger.info(f"Scanning '{path}' for pictures.")
@@ -74,19 +91,6 @@ def configure_logging():
     logger.addHandler(logging_handler)
     # TODO Set the logging level based on command line args.
     logger.setLevel(logging.INFO)
-
-
-def main():
-    configure_logging()
-    # TODO This should be a command line argument
-    src_root_dir = (
-        "/Users/ereichert/Library/CloudStorage/SynologyDrive-household/My Pictures"
-    )
-    # TODO This should be a command line argument
-    dst_dir = "/Users/ereichert/Desktop/photos"
-    file_paths = get_files(src_root_dir)
-    random_file_paths = get_random_file_paths(file_paths)
-    copy_files(random_file_paths, dst_dir)
 
 
 if __name__ == "__main__":

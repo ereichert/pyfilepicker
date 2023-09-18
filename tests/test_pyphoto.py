@@ -27,16 +27,13 @@ def test_copy_no_files_when_no_files_exist(
     write_test_jpg_files(src_dir, num_files_on_disk)
     write_test_filtered_files(src_dir, 100)
     dst_dir = tmp_path / "dst"
-    # TODO I should be able to call the program in a single command.
-    file_paths = main.get_files(src_dir)
-    random_file_paths = main.get_random_file_paths(file_paths, num_files_requested)
-    main.copy_files(random_file_paths, dst_dir)
-    dst_file_paths = []
+    main.get_random_files(src_dir, num_files_requested, dst_dir)
+    resulting_dst_file_paths = []
     for root, _, files in os.walk(dst_dir):
         for file in files:
-            dst_file_paths.append(os.path.join(root, file))
+            resulting_dst_file_paths.append(os.path.join(root, file))
 
-    assert len(dst_file_paths) == expected_files_copied
+    assert len(resulting_dst_file_paths) == expected_files_copied
 
 
 def write_test_jpg_files(dir, num_files):
