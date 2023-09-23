@@ -3,6 +3,7 @@ import main
 import os
 
 PARAMS = [
+    # num_files_on_disk, num_files_requested, expected_files_copied
     (0, 10, 0),  # no files on disk
     (50, 10, 10),  # more files on disk than requested
     (10, 25, 10),  # fewer files on disk than requested
@@ -13,13 +14,13 @@ PARAMS = [
 @pytest.mark.parametrize(
     "num_files_on_disk, num_files_requested, expected_files_copied", PARAMS
 )
-def test_copy_no_files_when_no_files_exist(
+def test_ensure_number_files_copied_is_correct(
     tmp_path, num_files_on_disk, num_files_requested, expected_files_copied
 ):
     """
     Ensure the correct number of files are copied to the destination directory
     given the state of the files on disk and the number of files requested by
-    the user.
+    the user. Each file copied should be unique.
     """
     src_dir = tmp_path / "src"
     src_dir.mkdir()
@@ -34,6 +35,7 @@ def test_copy_no_files_when_no_files_exist(
             resulting_dst_file_paths.append(os.path.join(root, file))
 
     assert len(resulting_dst_file_paths) == expected_files_copied
+    assert len(resulting_dst_file_paths) == len(set(resulting_dst_file_paths))
 
 
 def write_test_jpg_files(dir, num_files):
