@@ -96,15 +96,12 @@ def get_random_file_paths(starting_file_paths, num_requested_files):
     logger = logging.getLogger(__name__)
     logger.info("Requested number of files = %s", num_requested_files)
     num_file_paths = len(starting_file_paths)
-    # by using a set we ensure the files selected are
-    # unique for each run of the tool.
-    files_of_interest = set()
     if num_file_paths < num_requested_files:
         num_requested_files = num_file_paths
     random_nums = random.sample(range(0, num_file_paths), num_requested_files)
-    # TODO This should probably be a set comprehension
-    for n in random_nums:
-        files_of_interest.add(starting_file_paths[n])
+    # by using a set we ensure the files selected are
+    # unique for each run of the tool.
+    files_of_interest = {starting_file_paths[n] for n in random_nums}
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Random file paths:")
