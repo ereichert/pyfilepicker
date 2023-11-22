@@ -71,17 +71,31 @@ def parse_args(args):
 def get_random_files(
     src_root_dir, dst_dir, num_requested_files, extensions_of_interest
 ):
+    """Gets a list of files from the source directory,
+    selects n random files from that source directory,
+    and copies the randomly chosen files to the destination directory.
+    All subdirectories in the source directory will be scanned for files.
+    If a list of extensions of interest is specified as a command line argument
+    only files with those extensions will be selected from source directory.
+    The extension filter is applied to the original list of files. That is, before
+    random files are selected."""
     file_paths = get_files(src_root_dir, extensions_of_interest)
     random_file_paths = get_random_file_paths(file_paths, num_requested_files)
     copy_files(random_file_paths, dst_dir)
 
 
-def get_files(path, extensions_of_interest):
+def get_files(src_path, extensions_of_interest):
+    """Get all file paths in the src_path directory and its subdirectories.
+    If extensions_of_interest is not empty it will only select files with
+    extensions in the list.
+    If extensions_of_interest is empty, all files will be chosen.
+
+    Returns: List of file paths"""
     logger = logging.getLogger(__name__)
-    logger.critical(f"Scanning '{path}' for pictures.")
+    logger.critical(f"Scanning '{src_path}' for pictures.")
     file_paths = []
     extensions = []
-    for root, _, files in os.walk(path):
+    for root, _, files in os.walk(src_path):
         for file in files:
             filename_split = file.split(".")
             found_extension = filename_split[-1]
@@ -105,6 +119,11 @@ def get_files(path, extensions_of_interest):
 
 
 def get_random_file_paths(starting_file_paths, num_requested_files):
+    """Given a list of files via starting_file_paths will return the number of
+    requested files paths specified by num_requested_files. The files will be
+    will be chosen randomly from starting_file_paths.
+
+    Returns: List of randomly selected file paths."""
     logger = logging.getLogger(__name__)
     logger.info("Requested number of files = %s", num_requested_files)
     num_file_paths = len(starting_file_paths)
@@ -122,15 +141,19 @@ def get_random_file_paths(starting_file_paths, num_requested_files):
     return files_of_interest
 
 
-def copy_files(sources, destination):
+def copy_files(src_file_paths, dst_dir_path):
+    """Copies files specified by the list src_file_paths to the directory
+    specific by dst_dir_path. If the destination directory does not exist
+    it will be created. If the destination direction exists, the files will be
+    appended to the existing directory."""
     logger = logging.getLogger(__name__)
-    if not os.path.exists(destination):
-        logger.info(f"Directory, '{destination}' does not exist. Creating directory.")
-        os.mkdir(destination)
-    logger.critical(f"Copying files to '{destination}'.")
-    for src in sources:
+    if not os.path.exists(dst_dir_path):
+        logger.info(f"Directory, '{dst_dir_path}' does not exist. Creating directory.")
+        os.mkdir(dst_dir_path)
+    logger.critical(f"Copying files to '{dst_dir_path}'.")
+    for src in src_file_paths:
         logger.debug("Copying %s.", src)
-        shutil.copy(src, destination)
+        shutil.copy(src, dst_dir_path)
 
 
 def configure_logging(verbosity):

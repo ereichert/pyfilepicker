@@ -2,9 +2,6 @@ import pytest
 import main
 import os
 
-# Filtered files are files that we do not want to copy.
-# An example of filtered files are text files stored in the same directories
-# as the files of interest.
 NUM_EXTRA_FILES = 100
 
 PARAMS_WITHOUT_REQUESTED_NUM_FILES = [
