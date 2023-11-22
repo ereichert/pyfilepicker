@@ -5,7 +5,6 @@ import random
 import shutil
 import sys
 
-EXTENSIONS_OF_INTEREST = ["JPG", "jpg", "jpeg", "png", "tif", "gif", "TIF"]
 DEFAULT_NUM_REQUESTED_FILES = 50
 LOGGING_LEVELS = {
     0: logging.CRITICAL,
@@ -25,7 +24,10 @@ def main(args):
         else DEFAULT_NUM_REQUESTED_FILES
     )
     get_random_files(
-        args.source_root_directory, args.destination_directory, num_requested_files
+        args.source_root_directory,
+        args.destination_directory,
+        num_requested_files,
+        args.extensions,
     )
 
 
@@ -55,16 +57,26 @@ def parse_args(args):
         "verbose logging). CRITICAL=0, ERROR=1, WARN=2, INFO=3, "
         "DEBUG=4",
     )
+    arg_parser.add_argument(
+        "-e",
+        "--extensions",
+        nargs="+",
+        help="""List of extensions of interest. If a file having an extension 
+        of interest is found it will be considered for the randomized list 
+        of files.""",
+    )
     return arg_parser.parse_args(args)
 
 
-def get_random_files(src_root_dir, dst_dir, num_requested_files):
-    file_paths = get_files(src_root_dir)
+def get_random_files(
+    src_root_dir, dst_dir, num_requested_files, extensions_of_interest
+):
+    file_paths = get_files(src_root_dir, extensions_of_interest)
     random_file_paths = get_random_file_paths(file_paths, num_requested_files)
     copy_files(random_file_paths, dst_dir)
 
 
-def get_files(path):
+def get_files(path, extensions_of_interest):
     logger = logging.getLogger(__name__)
     logger.critical(f"Scanning '{path}' for pictures.")
     file_paths = []
@@ -73,14 +85,14 @@ def get_files(path):
         for file in files:
             filename_split = file.split(".")
             found_extension = filename_split[-1]
-            # TODO This may be a separate utility provided by the tool. Consider
-            # moving to its own command line flag and function.
             if logger.isEnabledFor(logging.DEBUG):
                 if found_extension not in extensions:
                     extensions.append(found_extension)
                     logger.debug(f"found extension: {found_extension}")
-            # TODO Read the list of filtered extensions from a config file.
-            if found_extension in EXTENSIONS_OF_INTEREST:
+            if extensions_of_interest:
+                if found_extension in extensions_of_interest:
+                    file_paths.append(os.path.join(root, file))
+            else:
                 file_paths.append(os.path.join(root, file))
 
     if logger.isEnabledFor(logging.DEBUG):

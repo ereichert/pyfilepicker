@@ -2,6 +2,62 @@ import pytest
 import main
 
 
+def test_parse_args_returns_correct_extensions_when_long_multiple():
+    returned_args = main.parse_args(
+        [
+            "/some/directory",
+            "/another_directory",
+            "--extensions",
+            "jpg",
+            "jpeg",
+            "gif",
+        ]
+    )
+
+    assert returned_args.extensions == ["jpg", "jpeg", "gif"]
+
+
+def test_parse_args_returns_correct_extensions_when_multiple():
+    returned_args = main.parse_args(
+        [
+            "/some/directory",
+            "/another_directory",
+            "-e",
+            "jpg",
+            "jpeg",
+            "gif",
+        ]
+    )
+
+    assert returned_args.extensions == ["jpg", "jpeg", "gif"]
+
+
+def test_parse_args_returns_correct_extensions():
+    returned_args = main.parse_args(
+        [
+            "/some/directory",
+            "/another_directory",
+            "-e",
+            "jpg",
+        ]
+    )
+
+    assert returned_args.extensions == ["jpg"]
+
+
+def test_parse_args_returns_correct_extensions_when_when_long():
+    returned_args = main.parse_args(
+        [
+            "/some/directory",
+            "/another_directory",
+            "--extensions",
+            "jpg",
+        ]
+    )
+
+    assert returned_args.extensions == ["jpg"]
+
+
 def test_parse_args_returns_correct_verbosity_when_a_long_multiple():
     returned_args = main.parse_args(
         [

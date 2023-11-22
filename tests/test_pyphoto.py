@@ -5,30 +5,36 @@ import os
 # Filtered files are files that we do not want to copy.
 # An example of filtered files are text files stored in the same directories
 # as the files of interest.
-NUM_FILTERED_FILES = 100
+NUM_EXTRA_FILES = 100
 
 PARAMS_WITHOUT_REQUESTED_NUM_FILES = [
-    # num_files_on_disk, expected_files_copied
-    (0, 0),  # no files on disk
+    # (num_files_of_interest_on_disk,
+    #   num_extra_files_on_disk,
+    #   expected_files_copied)
+    (0, 0, 0),  # no files on disk
     (
         main.DEFAULT_NUM_REQUESTED_FILES * 2,
+        0,
         main.DEFAULT_NUM_REQUESTED_FILES,
     ),  # more files on disk than default
     (
         int(main.DEFAULT_NUM_REQUESTED_FILES / 2),
+        0,
         int(main.DEFAULT_NUM_REQUESTED_FILES / 2),
     ),  # fewer files on disk than default
     (
         main.DEFAULT_NUM_REQUESTED_FILES,
+        0,
         main.DEFAULT_NUM_REQUESTED_FILES,
     ),  # same number of files on disk as default
 ]
 
 
 @pytest.mark.parametrize(
-    "num_files_on_disk, expected_num_files_copied", PARAMS_WITHOUT_REQUESTED_NUM_FILES
+    "num_files_of_interest_on_disk, num_extra_files_on_disk, expected_num_files_copied",
+    PARAMS_WITHOUT_REQUESTED_NUM_FILES,
 )
-def test_number_of_files_copied_without_num_files_requested(
+def test_number_of_files_copied_without_num_files_requested_or_extensions(
     src_dir,
     dst_dir,
     expected_num_files_copied,
@@ -37,6 +43,7 @@ def test_number_of_files_copied_without_num_files_requested(
     Ensure the correct number of files are copied to the destination directory
     given the state of the files on disk and the default number of files requested.
     Each file copied should be unique.
+    All extensions should be considered.
     """
     main.main(
         [
@@ -53,16 +60,57 @@ def test_number_of_files_copied_without_num_files_requested(
 
 
 PARAMS_WITH_REQUESTED_NUM_FILES = [
-    # num_files_on_disk, num_files_requested, expected_files_copied
-    (0, 10, 0),  # no files on disk
-    (50, 10, 10),  # more files on disk than requested
-    (10, 25, 10),  # fewer files on disk than requested
-    (25, 25, 25),  # same number of files on disk as were requested
+    # (num_files_of_interest_on_disk,
+    #   num_extra_files_on_disk,
+    #   num_files_requested,
+    #   expected_files_copied)
+    (0, 0, 10, 0),  # no files on disk
+    (50, NUM_EXTRA_FILES, 10, 10),  # more files on disk than requested
+    (10, 0, 25, 10),  # fewer files on disk than requested
+    (25, NUM_EXTRA_FILES, 25, 25),  # same number of files on disk as were requested
 ]
 
 
 @pytest.mark.parametrize(
-    "num_files_on_disk, num_files_requested, expected_num_files_copied",
+    """num_files_of_interest_on_disk, 
+        num_extra_files_on_disk, 
+        num_files_requested, 
+        expected_num_files_copied""",
+    PARAMS_WITH_REQUESTED_NUM_FILES,
+)
+def test_number_of_files_copied_without_extensions_cli_args(
+    src_dir,
+    dst_dir,
+    num_files_requested,
+    expected_num_files_copied,
+):
+    """
+    Ensure the correct number of files are copied to the destination directory
+    given the state of the files on disk and the number of files requested by
+    the user. Each file copied should be unique.
+    All extensions should be considered.
+    """
+    main.main(
+        [
+            str(src_dir),
+            str(dst_dir),
+            "--num_requested_files",
+            str(num_files_requested),
+        ]
+    )
+    resulting_dst_file_paths = get_resulting_dst_file_paths(dst_dir)
+
+    assert len(resulting_dst_file_paths) == expected_num_files_copied
+    # since the set cannot have duplicate files this will ensure the test
+    # accounts for duplicate file paths which we do not want.
+    assert len(resulting_dst_file_paths) == len(set(resulting_dst_file_paths))
+
+
+@pytest.mark.parametrize(
+    """num_files_of_interest_on_disk, 
+        num_extra_files_on_disk, 
+        num_files_requested, 
+        expected_num_files_copied""",
     PARAMS_WITH_REQUESTED_NUM_FILES,
 )
 def test_number_of_files_copied_with_all_cli_args(
@@ -82,6 +130,14 @@ def test_number_of_files_copied_with_all_cli_args(
             str(dst_dir),
             "--num_requested_files",
             str(num_files_requested),
+            "--extensions",
+            "JPG",
+            "jpg",
+            "jpeg",
+            "png",
+            "tif",
+            "gif",
+            "TIF",
         ]
     )
     resulting_dst_file_paths = get_resulting_dst_file_paths(dst_dir)
@@ -93,12 +149,12 @@ def test_number_of_files_copied_with_all_cli_args(
 
 
 @pytest.fixture
-def src_dir(tmp_path, num_files_on_disk):
+def src_dir(tmp_path, num_files_of_interest_on_disk, num_extra_files_on_disk):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     print(f"src directory is located at {src_dir}")
-    write_test_jpg_files(src_dir, num_files_on_disk)
-    write_test_filtered_files(src_dir, NUM_FILTERED_FILES)
+    write_test_jpg_files(src_dir, num_files_of_interest_on_disk)
+    write_test_filtered_files(src_dir, num_extra_files_on_disk)
     return src_dir
 
 
